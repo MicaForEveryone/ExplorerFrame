@@ -3,7 +3,7 @@
 
 ExplorerFrame is a program that resolves some improper behaviors caused by File Explorer regarding extending DWM frames into its client area.
 
-![A File Explorer window with DWM frames extended into its client area using ExplorerFrame](https://user-images.githubusercontent.com/29563098/201342798-7d3deaa2-8f09-4167-accd-0f849022d609.png)
+![A File Explorer window with DWM frames extended into its client area using ExplorerFrame](https://user-images.githubusercontent.com/29563098/201467236-9b888ef0-b21b-42a3-b858-1f1c36553765.png)
 
 ## Limitations
 - ExplorerFrame only works in Dark mode. Light mode will cause the text to render improperly.
