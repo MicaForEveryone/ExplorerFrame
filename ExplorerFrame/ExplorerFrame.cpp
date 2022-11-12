@@ -159,7 +159,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			HMENU hMenu = CreatePopupMenu();
 			AppendMenu(hMenu, MF_STRING, 1, L"Exit");
 			SetForegroundWindow(hWnd);
-			UINT clicked = TrackPopupMenu(hMenu, TPM_RETURNCMD | TPM_NONOTIFY, pt.x, pt.y, 0, hWnd, NULL);
+			UINT clicked = TrackPopupMenu(hMenu, TPM_RETURNCMD | TPM_BOTTOMALIGN, pt.x, pt.y, 0, hWnd, NULL);
 			DestroyMenu(hMenu);
 			if (clicked == 1)
 			{
@@ -198,7 +198,7 @@ void HandleWindow(HWND hwnd)
 	CloseHandle(processHandle);
 
 	// Check if the process is the Windows Explorer
-	if (wcscmp(processName, L"C:\\Windows\\explorer.exe") == 0 && hookingMap.find(tid) == hookingMap.end())
+	if (_wcsicmp(processName, L"C:\\Windows\\explorer.exe") == 0 && hookingMap.find(tid) == hookingMap.end())
 	{
 		HMODULE dll = LoadLibrary(L"Injector.dll");
 		if (!dll)

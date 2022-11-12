@@ -152,6 +152,9 @@
       <Project>{af25e190-dfae-4d35-8d91-970e952bd305}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="ExplorerFrame.manifest" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>
