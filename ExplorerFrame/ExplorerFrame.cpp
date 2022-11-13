@@ -56,7 +56,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wcex.lpszMenuName = NULL;
 	wcex.lpszClassName = L"ExplorerFrame";
-	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_EXPLORERFRAME));
 
 	auto a = RegisterClassExW(&wcex);
 	return a;
@@ -138,7 +138,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 	{
 		for (const auto& [_, value] : hookingMap) {
-			// Try to unhook DLL (wil::unique_hhook::get()), do nothing if failed.
 			try {
 				UnhookWindowsHookEx(value);
 			}
@@ -154,7 +153,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_CONTEXTMENU:
 		{
 			// Get the mouse location using WPARAM.
-			// Note: if the mouse is outside the notification icon rect, use the center point of the icon instead.
 			POINT pt = { GET_X_LPARAM(wParam), GET_Y_LPARAM(wParam) };
 			HMENU hMenu = CreatePopupMenu();
 			AppendMenu(hMenu, MF_STRING, 1, L"Exit");
