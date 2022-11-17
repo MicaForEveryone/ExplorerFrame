@@ -143,6 +143,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			catch (...) {}
 		}
+		
 		PostQuitMessage(0);
 		break;
 	}
@@ -185,6 +186,36 @@ void WinEventProc(
 	HandleWindow(hwnd);
 }
 
+bool IsWindowOfInterest(HWND hWnd)
+{
+	if (!IsWindow(hWnd) || !IsWindowVisible(hWnd))
+		return false;
+
+	WCHAR lpClassName[MAX_PATH];
+
+	GetClassName(hWnd, lpClassName, MAX_PATH);
+
+	auto styleEx = GetWindowLongPtrW(hWnd, GWL_EXSTYLE);
+
+	if (styleEx & WS_EX_NOACTIVATE || styleEx & WS_EX_LAYERED)
+		return false;
+
+	if (styleEx & WS_EX_APPWINDOW)
+		return true;
+
+	auto style = GetWindowLongPtrW(hWnd, GWL_STYLE);
+
+	if (!style)
+		return false;
+
+	auto hasTitleBar = style & WS_BORDER && style & WS_DLGFRAME;
+
+	if ((styleEx & WS_EX_TOOLWINDOW || style & WS_POPUP) && !hasTitleBar)
+		return false;
+
+	return true;
+}
+
 void HandleWindow(HWND hwnd)
 {
 	DWORD processId;
@@ -196,15 +227,33 @@ void HandleWindow(HWND hwnd)
 	CloseHandle(processHandle);
 
 	// Check if the process is the Windows Explorer
-	if (_wcsicmp(processName, L"C:\\Windows\\explorer.exe") == 0 && hookingMap.find(tid) == hookingMap.end())
+	if (_wcsicmp(processName, L"C:\\Windows\\explorer.exe") == 0)
 	{
-		HMODULE dll = LoadLibrary(L"Injector.dll");
-		if (!dll)
-			return;
-		auto procAddr = GetProcAddress(dll, "InjectExplorerHook");
-		auto method = reinterpret_cast<PFN_INJECT_EXPLORER_HOOK>(procAddr);
-		HHOOK hook = method(hwnd);
-		hookingMap.insert(std::pair<DWORD, HHOOK>(tid, hook));
-		FreeLibrary(dll);
+		bool isInjectionSuccessful = true;
+		if (hookingMap.find(tid) == hookingMap.end())
+		{
+			HMODULE dll = LoadLibrary(L"Injector.dll");
+			if (!dll)
+				return;
+			auto procAddr = GetProcAddress(dll, "InjectExplorerHook");
+			auto method = reinterpret_cast<PFN_INJECT_EXPLORER_HOOK>(procAddr);
+			HHOOK hook = method(hwnd);
+			if (hook != NULL)
+				hookingMap.insert(std::pair<DWORD, HHOOK>(tid, hook));
+			else
+				isInjectionSuccessful = false;
+			FreeLibrary(dll);
+		}
+
+		if (IsWindowOfInterest(hwnd) && isInjectionSuccessful)
+		{
+			MARGINS margins = MARGINS {
+				.cxLeftWidth = -1,
+				.cxRightWidth = -1,
+				.cyTopHeight = -1,
+				.cyBottomHeight = -1
+			};
+			DwmExtendFrameIntoClientArea(hwnd, &margins);
+		}
 	}
 }

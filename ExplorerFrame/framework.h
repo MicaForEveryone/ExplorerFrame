@@ -16,3 +16,4 @@
 #include <psapi.h>
 #include <shellapi.h>
 #include <windowsx.h>
+#include <dwmapi.h>

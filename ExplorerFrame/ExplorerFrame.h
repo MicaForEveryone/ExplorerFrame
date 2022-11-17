@@ -22,6 +22,8 @@ void                WinEventProc(
     DWORD         dwmsEventTime);
 void HandleWindow(HWND hwnd);
 
+bool IsWindowOfInterest(HWND);
+
 // Define SetPreferredAppMode
 typedef enum PREFERRED_APP_MODE
 {
